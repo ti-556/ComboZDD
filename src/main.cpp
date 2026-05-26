@@ -122,6 +122,7 @@ int main(int argc, char** argv) {
     std::cout << "Stored routes: " << result.routes.size() << "\n";
     std::cout << "Forced starter: " << moveName(db, *settings.forcedStarter) << "\n";
     std::cout << "Best damage: " << result.bestDamage << "\n";
+    std::cout << "Longest route length: " << result.longestLength << " moves including END\n";
     std::cout << "ZDD sets: " << zddStats.setCount
               << ", reachable nodes: " << zddStats.uniqueNodeCount
               << ", manager nodes: " << zddStats.nodeCount << "\n";
@@ -133,11 +134,17 @@ int main(int argc, char** argv) {
               << "combo_lens_state_graph.dot, combo_lens_state_graph.svg\n";
 
     if (!result.bestRoute.moves.empty()) {
-        std::cout << "Best route: ";
+        std::cout << "Best-damage route: ";
         printRoute(db, result.bestRoute);
         std::cout << "\n";
 
-        std::cout << "Final abstract state: opp=" << oppStateName(result.bestRoute.finalState.opp)
+        if (!result.longestRoute.moves.empty()) {
+            std::cout << "Longest route: ";
+            printRoute(db, result.longestRoute);
+            std::cout << " | dmg=" << result.longestRoute.stats.totalDamage << "\n";
+        }
+
+        std::cout << "Final abstract state of best-damage route: opp=" << oppStateName(result.bestRoute.finalState.opp)
                   << ", height=" << static_cast<int>(result.bestRoute.finalState.height)
                   << ", distance=" << static_cast<int>(result.bestRoute.finalState.distance)
                   << ", wallDist=" << static_cast<int>(result.bestRoute.finalState.wallDist)

@@ -1,5 +1,3 @@
-# readme desu
-
 sudo apt update
 sudo apt install -y build-essential cmake ninja-build graphviz
 sudo apt install graphviz
@@ -201,13 +199,23 @@ jH
 Super1
 ```
 
-The intended main route is:
+The intended main damage route is:
 
 ```text
 2M > 5H > 2H > jM > 236H > Super1 > END
 ```
 
-There is also a shorter `jH` branch.
+The engine also supports delayed cancels inside a cancel window. For example,
+with `2H` as the forced starter, this longer route is found by delaying `236H`
+after `jH` until its frame-level hitbox connects:
+
+```text
+2H > jM > jH > 236H > Super1 > END
+```
+
+Note that this longer route is not necessarily the best-damage route. Because
+ComboLens applies damage scaling, adding `jH` before `236H` can lower the final
+scaled damage even though the combo is longer.
 
 ---
 
@@ -248,8 +256,12 @@ inputs so wall pressure does not require releasing directions perfectly.
 It also shows a compact command list and a live combo counter with current hits,
 combo damage, and max hits. A 10-frame input buffer stores commands entered
 during recovery or hitstop and runs them on the first legal actionable frame.
+Buffered commands can also fire during valid cancel windows, matching route
+search transitions such as `2M > 5H > 2H`.
 The debugger enforces the example move requirements used by route search,
 including self/opponent grounded or airborne state and the juggle cap.
+When the opponent returns to neutral, combo-only resources such as scaling,
+juggle, wall bounce, and wall splat are reset for the next attempt.
 
 Run tests:
 
@@ -273,15 +285,18 @@ The exact route count can change if you edit move data, but the included version
 ComboLens v1 demo
 =================
 Moves loaded: 7
-Routes found: 7
-Stored routes: 7
-Best damage: 239
-ZDD sets: 7, reachable nodes: 16, manager nodes: 74
-State graph: 8 nodes, 7 edges, 0 degenerate loop(s)
+Routes found: 8
+Stored routes: 8
+Forced starter: 2H
+Best damage: 248
+Longest route length: 6 moves including END
+ZDD sets: 8, reachable nodes: 18, manager nodes: 73
+State graph: 9 nodes, 8 edges, 0 degenerate loop(s)
 Visualization exports: combo_lens_routes.zdd.dot, combo_lens_routes.zdd.svg, combo_lens_state_graph.dot, combo_lens_state_graph.svg
-Best route: 2M > 5H > 2H > jM > 236H > Super1 > END
-Final abstract state: opp=Knockdown, height=0, distance=4, wallDist=1, meterBucket=0, scalingBucket=8, juggle=8
-ZDD variables: 2 67 132 197 263 328 385
+Best-damage route: 2H > jM > 236H > Super1 > END
+Longest route: 2H > jM > jH > 236H > Super1 > END | dmg=236
+Final abstract state of best-damage route: opp=Knockdown, height=0, distance=4, wallDist=1, meterBucket=0, scalingBucket=5, juggle=5
+ZDD variables: 4 69 135 200 257
 ```
 
 ---
@@ -305,6 +320,8 @@ Not implemented yet:
 - real animation assets
 
 Also, the current `SearchState -> FrameState` representative strategy stores one representative frame state per search node. In the future, multiple frame representatives may be needed for each abstract state, because different exact positions can bucket to the same abstract state but produce different hitbox outcomes.
+
+The hybrid transition currently samples bounded delayed timing choices from the representative frame state. This is important for routes where an immediate cancel whiffs but a slightly delayed cancel connects. It is still not a full frame-level state expansion; the sampled result is canonicalized back into `SearchState` before route/ZDD insertion.
 
 ---
 

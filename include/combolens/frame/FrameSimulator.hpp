@@ -33,6 +33,13 @@ inline bool checkHit(const FrameState& s, const MoveDef& move) {
     return false;
 }
 
+inline bool opponentCanBeHitByMove(const FrameState& s) {
+    // Starters may hit neutral; follow-up combo hits must reach an active
+    // hitbox while the opponent is still in hitstun/hitstop.
+    if (s.lastMove == MOVE_NONE) return true;
+    return s.opp.hitstunRemaining > 0 || s.opp.hitstopRemaining > 0;
+}
+
 inline void updateMotion(CharacterFrameState& c, const SimSettings& settings) {
     c.pos.x += c.vel.x;
     c.pos.y += c.vel.y;
@@ -191,7 +198,7 @@ inline SimResult simulateMoveFromState(FrameState start, const MoveDef& move, Si
         updateTimers(s.opp);
 
         bool hitThisFrame = false;
-        if (!alreadyHit && s.self.phase == ActionPhase::Active && checkHit(s, move)) {
+        if (!alreadyHit && s.self.phase == ActionPhase::Active && opponentCanBeHitByMove(s) && checkHit(s, move)) {
             applyHit(s, move);
             checkWallSplat(s, move, settings);
             alreadyHit = true;

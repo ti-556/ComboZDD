@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="2075" viewBox="0 0 900 2075">
+<rect width="100%" height="100%" fill="#f7f5ef"/>
+<style>text{font-family:Helvetica,Arial,sans-serif;font-size:13px}.title{font-size:18px;font-weight:700}.node{stroke:#2f302c;stroke-width:1.4}.edge0{stroke:#7b8da5;stroke-width:1.5;stroke-dasharray:6 5;fill:none}.edge1{stroke:#c7372f;stroke-width:1.8;fill:none}.edgeLabel{font-size:11px;fill:#444}</style>
+<defs><marker id="arrow1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#c7372f"/></marker><marker id="arrow0" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#7b8da5"/></marker></defs>
+<text class="title" x="24" y="32">ComboLens Route ZDD</text>
+<text x="24" y="54" fill="#555">solid red = include variable, dashed blue = skip variable</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M80,1593 C80,1737.5 80,1737.5 80,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="80" y="1733.5">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M80,1593 C80,1737.5 820,1737.5 820,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="450" y="1733.5">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M450,1823 C450,1852.5 80,1852.5 80,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="265" y="1848.5">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M450,1823 C450,1852.5 820,1852.5 820,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="635" y="1848.5">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M450,1708 C450,1795 80,1795 80,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="265" y="1791">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M450,1708 C450,1737.5 450,1737.5 450,1771"/>
+<text class="edgeLabel" text-anchor="middle" x="450" y="1733.5">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M820,1593 C820,1622.5 450,1622.5 450,1656"/>
+<text class="edgeLabel" text-anchor="middle" x="635" y="1618.5">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M820,1593 C820,1737.5 820,1737.5 820,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="820" y="1733.5">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M450,1363 C450,1622.5 80,1622.5 80,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="265" y="1618.5">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M450,1363 C450,1450 820,1450 820,1541"/>
+<text class="edgeLabel" text-anchor="middle" x="635" y="1446">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M80,1248 C80,1277.5 450,1277.5 450,1311"/>
+<text class="edgeLabel" text-anchor="middle" x="265" y="1273.5">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M80,1248 C80,1565 820,1565 820,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="450" y="1561">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M450,1478 C450,1680 80,1680 80,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="265" y="1676">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M450,1478 C450,1507.5 80,1507.5 80,1541"/>
+<text class="edgeLabel" text-anchor="middle" x="265" y="1503.5">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M820,1248 C820,1335 450,1335 450,1426"/>
+<text class="edgeLabel" text-anchor="middle" x="635" y="1331">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M820,1248 C820,1565 820,1565 820,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="820" y="1561">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M450,1133 C450,1507.5 80,1507.5 80,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="265" y="1503.5">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M450,1133 C450,1162.5 820,1162.5 820,1196"/>
+<text class="edgeLabel" text-anchor="middle" x="635" y="1158.5">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M450,1018 C450,1047.5 450,1047.5 450,1081"/>
+<text class="edgeLabel" text-anchor="middle" x="450" y="1043.5">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M450,1018 C450,1105 80,1105 80,1196"/>
+<text class="edgeLabel" text-anchor="middle" x="265" y="1101">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M450,903 C450,932.5 450,932.5 450,966"/>
+<text class="edgeLabel" text-anchor="middle" x="450" y="928.5">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M450,903 C450,1392.5 820,1392.5 820,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="635" y="1388.5">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M450,788 C450,1335 80,1335 80,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="265" y="1331">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M450,788 C450,817.5 450,817.5 450,851"/>
+<text class="edgeLabel" text-anchor="middle" x="450" y="813.5">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M450,673 C450,702.5 450,702.5 450,736"/>
+<text class="edgeLabel" text-anchor="middle" x="450" y="698.5">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M450,673 C450,1277.5 820,1277.5 820,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="635" y="1273.5">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M450,558 C450,1220 80,1220 80,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="265" y="1216">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M450,558 C450,587.5 450,587.5 450,621"/>
+<text class="edgeLabel" text-anchor="middle" x="450" y="583.5">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M450,443 C450,472.5 450,472.5 450,506"/>
+<text class="edgeLabel" text-anchor="middle" x="450" y="468.5">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M450,443 C450,1162.5 820,1162.5 820,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="635" y="1158.5">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M450,328 C450,1105 80,1105 80,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="265" y="1101">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M450,328 C450,357.5 450,357.5 450,391"/>
+<text class="edgeLabel" text-anchor="middle" x="450" y="353.5">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M450,213 C450,242.5 450,242.5 450,276"/>
+<text class="edgeLabel" text-anchor="middle" x="450" y="238.5">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M450,213 C450,1047.5 820,1047.5 820,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="635" y="1043.5">1</text>
+<path class="edge0" marker-end="url(#arrow0)" d="M450,98 C450,990 80,990 80,1886"/>
+<text class="edgeLabel" text-anchor="middle" x="265" y="986">0</text>
+<path class="edge1" marker-end="url(#arrow1)" d="M450,98 C450,127.5 450,127.5 450,161"/>
+<text class="edgeLabel" text-anchor="middle" x="450" y="123.5">1</text>
+<rect class="node" x="56" y="1892" width="48" height="36" rx="5" fill="#f3d7d2"/>
+<text text-anchor="middle" x="80" y="1915">0</text>
+<rect class="node" x="796" y="1892" width="48" height="36" rx="5" fill="#d7eadf"/>
+<text text-anchor="middle" x="820" y="1915">1</text>
+<circle class="node" cx="80" cy="1565" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="80" y="1561">#42</text>
+<text text-anchor="middle" x="80" y="1577" font-size="11">6:END</text>
+<circle class="node" cx="450" cy="1795" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="450" y="1791">#59</text>
+<text text-anchor="middle" x="450" y="1807" font-size="11">7:END</text>
+<circle class="node" cx="450" cy="1680" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="450" y="1676">#60</text>
+<text text-anchor="middle" x="450" y="1692" font-size="11">6:Super1</text>
+<circle class="node" cx="820" cy="1565" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="820" y="1561">#67</text>
+<text text-anchor="middle" x="820" y="1577" font-size="11">6:END</text>
+<circle class="node" cx="450" cy="1335" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="450" y="1331">#68</text>
+<text text-anchor="middle" x="450" y="1347" font-size="11">5:236H</text>
+<circle class="node" cx="80" cy="1220" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="80" y="1216">#69</text>
+<text text-anchor="middle" x="80" y="1232" font-size="11">5:END</text>
+<circle class="node" cx="450" cy="1450" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="450" y="1446">#93</text>
+<text text-anchor="middle" x="450" y="1462" font-size="11">5:Super1</text>
+<circle class="node" cx="820" cy="1220" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="820" y="1216">#99</text>
+<text text-anchor="middle" x="820" y="1232" font-size="11">5:END</text>
+<circle class="node" cx="450" cy="1105" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="450" y="1101">#100</text>
+<text text-anchor="middle" x="450" y="1117" font-size="11">4:236H</text>
+<circle class="node" cx="450" cy="990" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="450" y="986">#101</text>
+<text text-anchor="middle" x="450" y="1002" font-size="11">4:jH</text>
+<circle class="node" cx="450" cy="875" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="450" y="871">#102</text>
+<text text-anchor="middle" x="450" y="887" font-size="11">4:END</text>
+<circle class="node" cx="450" cy="760" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="450" y="756">#103</text>
+<text text-anchor="middle" x="450" y="772" font-size="11">3:jM</text>
+<circle class="node" cx="450" cy="645" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="450" y="641">#104</text>
+<text text-anchor="middle" x="450" y="657" font-size="11">3:END</text>
+<circle class="node" cx="450" cy="530" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="450" y="526">#105</text>
+<text text-anchor="middle" x="450" y="542" font-size="11">2:2H</text>
+<circle class="node" cx="450" cy="415" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="450" y="411">#106</text>
+<text text-anchor="middle" x="450" y="427" font-size="11">2:END</text>
+<circle class="node" cx="450" cy="300" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="450" y="296">#107</text>
+<text text-anchor="middle" x="450" y="312" font-size="11">1:5H</text>
+<circle class="node" cx="450" cy="185" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="450" y="181">#108</text>
+<text text-anchor="middle" x="450" y="197" font-size="11">1:END</text>
+<circle class="node" cx="450" cy="70" r="28" fill="#ffffff"/>
+<text text-anchor="middle" x="450" y="66">#109</text>
+<text text-anchor="middle" x="450" y="82" font-size="11">0:2M</text>
+</svg>

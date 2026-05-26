@@ -22,6 +22,12 @@ int main() {
     assert(first.hitVerified);
     assert(first.damage > 0);
 
+    MoveDef tooSlowHeavy = db.byId(db.idByName("5H"));
+    tooSlowHeavy.startup = 40;
+    tooSlowHeavy.active = 4;
+    tooSlowHeavy.hitboxes = {{40, 43, Rect{22, 28, 78, 30}}};
+    assert(!tryApplyMoveHybrid(SearchNode{first.next, first.nextRepresentativeFrame}, tooSlowHeavy, db).valid);
+
     SearchSettings settings;
     settings.maxDepth = MAX_COMBO_LEN;
     settings.forcedStarter = db.idByName("2M");
@@ -60,7 +66,32 @@ int main() {
     assert(transitionGraphToDot(graph, db, &loops).find("digraph StateTransitionGraph") != std::string::npos);
     assert(transitionGraphToSvg(graph, db, &loops).find("<svg") != std::string::npos);
 
-    SearchSettings heavyStarterSettings;
+
+    SearchSettings launcherSettings;
+    launcherSettings.maxDepth = MAX_COMBO_LEN;
+    launcherSettings.forcedStarter = db.idByName("2H");
+    launcherSettings.routeLimit = 100000;
+    SearchResult launcherResult = searchRoutes(initial, db, launcherSettings);
+    const std::vector<MoveId> delayedCancelRoute = {
+        db.idByName("2H"),
+        db.idByName("jM"),
+        db.idByName("jH"),
+        db.idByName("236H"),
+        db.idByName("Super1"),
+        MOVE_END
+    };
+    bool foundDelayedCancelRoute = false;
+    for (const Route& route : launcherResult.routes) {
+        if (route.moves == delayedCancelRoute) {
+            foundDelayedCancelRoute = true;
+            break;
+        }
+    }
+    assert(foundDelayedCancelRoute);
+    assert(launcherResult.bestRoute.moves == std::vector<MoveId>({db.idByName("2H"), db.idByName("jM"), db.idByName("236H"), db.idByName("Super1"), MOVE_END}));
+    assert(launcherResult.longestRoute.moves == delayedCancelRoute);
+
+        SearchSettings heavyStarterSettings;
     heavyStarterSettings.maxDepth = MAX_COMBO_LEN;
     heavyStarterSettings.forcedStarter = db.idByName("5H");
     heavyStarterSettings.routeLimit = 100000;
