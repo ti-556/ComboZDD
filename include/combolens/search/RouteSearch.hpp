@@ -15,8 +15,12 @@ struct SearchSettings {
 struct SearchResult {
     std::vector<Route> routes;
     std::size_t routeCount = 0;
+
     Route bestRoute;
     int bestDamage = 0;
+
+    Route longestRoute;
+    std::size_t longestLength = 0;
 };
 
 struct SearchContext {
@@ -45,6 +49,11 @@ inline void recordRouteWithEnd(const SearchNode& node, const std::vector<MoveId>
     if (stats.totalDamage > out.bestDamage) {
         out.bestDamage = stats.totalDamage;
         out.bestRoute = r;
+    }
+
+    if (r.moves.size() > out.longestLength) {
+        out.longestLength = r.moves.size();
+        out.longestRoute = r;
     }
 }
 

@@ -8,12 +8,16 @@ digraph StateTransitionGraph {
   s4 [label="#4 d4\nAirborne/Airborne\nact=12 hitstun=30 cancel=7\nh=1 d=1 wall=3\nm=2 scale=6 juggle=6\nlast=5", fillcolor="#f7f5ef"];
   s5 [label="#5 d5\nAirborne/Airborne\nact=16 hitstun=32 cancel=6\nh=2 d=2 wall=3\nm=2 scale=8 juggle=7\nlast=6", fillcolor="#f7f5ef"];
   s6 [label="#6 d5\nGrounded/WallSplat\nact=22 hitstun=58 cancel=8\nh=0 d=4 wall=1\nm=2 scale=8 juggle=8\nlast=7", fillcolor="#f7f5ef"];
-  s7 [label="#7 d6\nGrounded/Knockdown\nact=0 hitstun=0 cancel=0\nh=0 d=4 wall=1\nm=0 scale=8 juggle=8\nlast=8", fillcolor="#d7eadf"];
+  s7 [label="#7 d6\nGrounded/WallSplat\nact=22 hitstun=58 cancel=4\nh=0 d=4 wall=1\nm=2 scale=8 juggle=9\nlast=7", fillcolor="#f7f5ef"];
+  s8 [label="#8 d6\nGrounded/Knockdown\nact=0 hitstun=0 cancel=0\nh=0 d=4 wall=1\nm=0 scale=8 juggle=8\nlast=8", fillcolor="#d7eadf"];
+  s9 [label="#9 d7\nGrounded/Knockdown\nact=0 hitstun=0 cancel=0\nh=0 d=4 wall=1\nm=0 scale=8 juggle=9\nlast=8", fillcolor="#d7eadf"];
   s0 -> s1 [label="2M dmg=40"];
   s1 -> s2 [label="5H dmg=63"];
   s2 -> s3 [label="2H dmg=45"];
   s3 -> s4 [label="jM dmg=19"];
   s4 -> s5 [label="jH dmg=24"];
   s4 -> s6 [label="236H dmg=36"];
-  s6 -> s7 [label="Super1 dmg=36"];
+  s5 -> s7 [label="236H dmg=18"];
+  s6 -> s8 [label="Super1 dmg=36"];
+  s7 -> s9 [label="Super1 dmg=36"];
 }

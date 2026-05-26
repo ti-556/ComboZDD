@@ -55,6 +55,14 @@ inline CancelMask cancelMaskNeededForCategory(MoveCategory category) {
     return 0;
 }
 
+inline bool canLinkFrom(MoveId previous, const MoveDef& next, const MoveDatabase& db) {
+    if (previous == MOVE_NONE || previous == MOVE_END) return false;
+    if (next.allowGenericLink) return true;
+    if (moveInList(previous, next.linkFromMoves)) return true;
+    const MoveCategory prevCat = db.byId(previous).category;
+    return categoryInList(prevCat, next.linkFromCategories);
+}
+
 inline bool timingAllowsMove(const SearchState& s, const MoveDef& m, const MoveDatabase& db) {
     const bool starter = s.lastMove == MOVE_NONE && m.canStartCombo;
 
@@ -66,7 +74,11 @@ inline bool timingAllowsMove(const SearchState& s, const MoveDef& m, const MoveD
         cancel = direct || ((s.availableCancels & needed) != 0);
     }
 
-    const bool link = s.selfActionableIn == 0 && m.startup <= s.oppHitstunRemaining;
+    const bool link =
+        s.selfActionableIn == 0 &&
+        m.startup <= s.oppHitstunRemaining &&
+        canLinkFrom(s.lastMove, m, db);
+
     return starter || cancel || link;
 }
 
@@ -120,25 +132,71 @@ inline void prepareFrameStateForMove(FrameState& f, const SearchState& s, const 
     }
 }
 
+inline void advanceRepresentativeOneFrame(FrameState& f, const SimSettings& settings) {
+    // Advance an existing post-hit/cancel-window representative without choosing a
+    // new move. This lets the search model delayed cancels/links without expanding
+    // every frame as a SearchState. Hitstop freezes animation and physics, matching
+    // the frame simulator's behavior.
+    if (f.self.hitstopRemaining > 0 || f.opp.hitstopRemaining > 0) {
+        f.self.hitstopRemaining = std::max(0, f.self.hitstopRemaining - 1);
+        f.opp.hitstopRemaining = std::max(0, f.opp.hitstopRemaining - 1);
+        f.globalFrame++;
+        return;
+    }
+
+    updateMotion(f.self, settings);
+    updateMotion(f.opp, settings);
+    updateTimers(f.self);
+    updateTimers(f.opp);
+
+    if (f.self.currentMove != MOVE_NONE) {
+        f.self.moveFrame++;
+    }
+
+    f.globalFrame++;
+}
+
 inline TransitionResult tryApplyMoveHybrid(const SearchNode& node, const MoveDef& move, const MoveDatabase& db, SimSettings simSettings = {}) {
     TransitionResult out;
-    const SearchState& s = node.abstract;
 
-    if (!abstractRequirementsPass(s, move)) return out;
-    if (!timingAllowsMove(s, move, db)) return out;
+    // Important: a valid route may require delaying the next move inside a cancel
+    // window or an explicitly-authorized link window. Earlier versions only tried
+    // delay=0, which missed routes such as jH > delayed 236H when the immediate
+    // cancel whiffed vertically. We still keep the search event-driven by trying
+    // only a bounded set of timing samples from the current representative state.
+    const int hitstopBudget = std::max(node.representative.self.hitstopRemaining, node.representative.opp.hitstopRemaining);
+    const int abstractCancelBudget = static_cast<int>(node.abstract.cancelWindowRemaining) + hitstopBudget;
+    const int abstractLinkBudget = (node.abstract.selfActionableIn == 0)
+        ? static_cast<int>(node.abstract.oppHitstunRemaining)
+        : 0;
+    const int maxDelay = std::min(30, std::max({0, abstractCancelBudget, abstractLinkBudget}));
 
-    FrameState start = node.representative;
-    prepareFrameStateForMove(start, s, move);
+    FrameState delayedFrame = node.representative;
 
-    SimResult sim = simulateMoveFromState(start, move, simSettings);
-    if (!sim.hit) return out;
+    for (int delay = 0; delay <= maxDelay; ++delay) {
+        SearchState delayedAbs = abstractFromFrameState(delayedFrame, db);
 
-    out.valid = true;
-    out.nextRepresentativeFrame = sim.finalFrameState;
-    out.next = abstractFromFrameState(sim.finalFrameState, db);
-    out.damage = computeDamage(s, move);
-    out.difficulty = move.difficulty;
-    out.hitVerified = true;
+        if (abstractRequirementsPass(delayedAbs, move) && timingAllowsMove(delayedAbs, move, db)) {
+            FrameState start = delayedFrame;
+            prepareFrameStateForMove(start, delayedAbs, move);
+
+            SimResult sim = simulateMoveFromState(start, move, simSettings);
+            if (sim.hit) {
+                out.valid = true;
+                out.nextRepresentativeFrame = sim.finalFrameState;
+                out.next = abstractFromFrameState(sim.finalFrameState, db);
+                out.damage = computeDamage(delayedAbs, move);
+                out.difficulty = move.difficulty;
+                out.hitVerified = true;
+                return out;
+            }
+        }
+
+        if (delay < maxDelay) {
+            advanceRepresentativeOneFrame(delayedFrame, simSettings);
+        }
+    }
+
     return out;
 }
 

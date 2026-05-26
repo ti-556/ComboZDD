@@ -111,6 +111,13 @@ struct MoveDef {
     std::vector<MoveId> cancelFromMoves;
     std::vector<MoveCategory> cancelFromCategories;
 
+    // Link policy for delayed, non-cancel follow-ups.
+    // This prevents the search from treating every move as repeat-linkable
+    // just because startup <= remaining hitstun. Moves must explicitly opt in.
+    bool allowGenericLink = false;
+    std::vector<MoveId> linkFromMoves;
+    std::vector<MoveCategory> linkFromCategories;
+
     int difficulty = 1;
 };
 

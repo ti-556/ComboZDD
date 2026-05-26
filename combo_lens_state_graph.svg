@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1960" height="470" viewBox="0 0 1960 470">
+<svg xmlns="http://www.w3.org/2000/svg" width="2220" height="470" viewBox="0 0 2220 470">
 <rect width="100%" height="100%" fill="#f7f5ef"/>
 <style>text{font-family:Helvetica,Arial,sans-serif;font-size:12px}.title{font-size:18px;font-weight:700}.node{stroke:#2f302c;stroke-width:1.3}.edgeLabel{font-size:11px;fill:#333}.tiny{font-size:10px;fill:#555}</style>
 <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#53626f"/></marker></defs>
@@ -22,9 +22,15 @@
 <path marker-end="url(#arrow)" d="M1212,125 C1260,125 1260,275 1308,275" fill="none" stroke="#53626f" stroke-width="1.6"/>
 <rect x="1226" y="189" width="68" height="20" rx="4" fill="#f7f5ef" stroke="#cbc6b9"/>
 <text class="edgeLabel" text-anchor="middle" x="1260" y="204">236H dmg=36</text>
-<path marker-end="url(#arrow)" d="M1472,275 C1520,275 1520,125 1568,125" fill="none" stroke="#53626f" stroke-width="1.6"/>
-<rect x="1486" y="189" width="68" height="20" rx="4" fill="#f7f5ef" stroke="#cbc6b9"/>
-<text class="edgeLabel" text-anchor="middle" x="1520" y="204">Super1 dmg=36</text>
+<path marker-end="url(#arrow)" d="M1472,125 C1520,125 1520,125 1568,125" fill="none" stroke="#53626f" stroke-width="1.6"/>
+<rect x="1486" y="114" width="68" height="20" rx="4" fill="#f7f5ef" stroke="#cbc6b9"/>
+<text class="edgeLabel" text-anchor="middle" x="1520" y="129">236H dmg=18</text>
+<path marker-end="url(#arrow)" d="M1472,275 C1520,275 1520,275 1568,275" fill="none" stroke="#53626f" stroke-width="1.6"/>
+<rect x="1486" y="264" width="68" height="20" rx="4" fill="#f7f5ef" stroke="#cbc6b9"/>
+<text class="edgeLabel" text-anchor="middle" x="1520" y="279">Super1 dmg=36</text>
+<path marker-end="url(#arrow)" d="M1732,125 C1780,125 1780,125 1828,125" fill="none" stroke="#53626f" stroke-width="1.6"/>
+<rect x="1746" y="114" width="68" height="20" rx="4" fill="#f7f5ef" stroke="#cbc6b9"/>
+<text class="edgeLabel" text-anchor="middle" x="1780" y="129">Super1 dmg=36</text>
 <rect class="node" x="8" y="77" width="164" height="96" rx="7" fill="#ffffff"/>
 <text text-anchor="middle" x="90" y="97">#0 depth 0</text>
 <text class="tiny" text-anchor="middle" x="90" y="115">Grounded / Neutral</text>
@@ -60,9 +66,19 @@
 <text class="tiny" text-anchor="middle" x="1390" y="265">Grounded / WallSplat</text>
 <text class="tiny" text-anchor="middle" x="1390" y="281">act 22 hitstun 58 cancel 8</text>
 <text class="tiny" text-anchor="middle" x="1390" y="297">m 2 scale 8 juggle 8 last 7</text>
-<rect class="node" x="1568" y="77" width="164" height="96" rx="7" fill="#d7eadf"/>
+<rect class="node" x="1568" y="77" width="164" height="96" rx="7" fill="#ffffff"/>
 <text text-anchor="middle" x="1650" y="97">#7 depth 6</text>
-<text class="tiny" text-anchor="middle" x="1650" y="115">Grounded / Knockdown</text>
-<text class="tiny" text-anchor="middle" x="1650" y="131">act 0 hitstun 0 cancel 0</text>
-<text class="tiny" text-anchor="middle" x="1650" y="147">m 0 scale 8 juggle 8 last 8</text>
+<text class="tiny" text-anchor="middle" x="1650" y="115">Grounded / WallSplat</text>
+<text class="tiny" text-anchor="middle" x="1650" y="131">act 22 hitstun 58 cancel 4</text>
+<text class="tiny" text-anchor="middle" x="1650" y="147">m 2 scale 8 juggle 9 last 7</text>
+<rect class="node" x="1568" y="227" width="164" height="96" rx="7" fill="#d7eadf"/>
+<text text-anchor="middle" x="1650" y="247">#8 depth 6</text>
+<text class="tiny" text-anchor="middle" x="1650" y="265">Grounded / Knockdown</text>
+<text class="tiny" text-anchor="middle" x="1650" y="281">act 0 hitstun 0 cancel 0</text>
+<text class="tiny" text-anchor="middle" x="1650" y="297">m 0 scale 8 juggle 8 last 8</text>
+<rect class="node" x="1828" y="77" width="164" height="96" rx="7" fill="#d7eadf"/>
+<text text-anchor="middle" x="1910" y="97">#9 depth 7</text>
+<text class="tiny" text-anchor="middle" x="1910" y="115">Grounded / Knockdown</text>
+<text class="tiny" text-anchor="middle" x="1910" y="131">act 0 hitstun 0 cancel 0</text>
+<text class="tiny" text-anchor="middle" x="1910" y="147">m 0 scale 8 juggle 9 last 8</text>
 </svg>
