@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1960" height="470" viewBox="0 0 1960 470">
+<rect width="100%" height="100%" fill="#f7f5ef"/>
+<style>text{font-family:Helvetica,Arial,sans-serif;font-size:12px}.title{font-size:18px;font-weight:700}.node{stroke:#2f302c;stroke-width:1.3}.edgeLabel{font-size:11px;fill:#333}.tiny{font-size:10px;fill:#555}</style>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#53626f"/></marker></defs>
+<text class="title" x="24" y="32">ComboLens State Transition Graph</text>
+<text x="24" y="54" fill="#555">red nodes/edges are SCC degenerate loops; green nodes are terminal states</text>
+<path marker-end="url(#arrow)" d="M172,125 C220,125 220,125 268,125" fill="none" stroke="#53626f" stroke-width="1.6"/>
+<rect x="186" y="114" width="68" height="20" rx="4" fill="#f7f5ef" stroke="#cbc6b9"/>
+<text class="edgeLabel" text-anchor="middle" x="220" y="129">2M dmg=40</text>
+<path marker-end="url(#arrow)" d="M432,125 C480,125 480,125 528,125" fill="none" stroke="#53626f" stroke-width="1.6"/>
+<rect x="446" y="114" width="68" height="20" rx="4" fill="#f7f5ef" stroke="#cbc6b9"/>
+<text class="edgeLabel" text-anchor="middle" x="480" y="129">5H dmg=63</text>
+<path marker-end="url(#arrow)" d="M692,125 C740,125 740,125 788,125" fill="none" stroke="#53626f" stroke-width="1.6"/>
+<rect x="706" y="114" width="68" height="20" rx="4" fill="#f7f5ef" stroke="#cbc6b9"/>
+<text class="edgeLabel" text-anchor="middle" x="740" y="129">2H dmg=45</text>
+<path marker-end="url(#arrow)" d="M952,125 C1000,125 1000,125 1048,125" fill="none" stroke="#53626f" stroke-width="1.6"/>
+<rect x="966" y="114" width="68" height="20" rx="4" fill="#f7f5ef" stroke="#cbc6b9"/>
+<text class="edgeLabel" text-anchor="middle" x="1000" y="129">jM dmg=19</text>
+<path marker-end="url(#arrow)" d="M1212,125 C1260,125 1260,125 1308,125" fill="none" stroke="#53626f" stroke-width="1.6"/>
+<rect x="1226" y="114" width="68" height="20" rx="4" fill="#f7f5ef" stroke="#cbc6b9"/>
+<text class="edgeLabel" text-anchor="middle" x="1260" y="129">jH dmg=24</text>
+<path marker-end="url(#arrow)" d="M1212,125 C1260,125 1260,275 1308,275" fill="none" stroke="#53626f" stroke-width="1.6"/>
+<rect x="1226" y="189" width="68" height="20" rx="4" fill="#f7f5ef" stroke="#cbc6b9"/>
+<text class="edgeLabel" text-anchor="middle" x="1260" y="204">236H dmg=36</text>
+<path marker-end="url(#arrow)" d="M1472,275 C1520,275 1520,125 1568,125" fill="none" stroke="#53626f" stroke-width="1.6"/>
+<rect x="1486" y="189" width="68" height="20" rx="4" fill="#f7f5ef" stroke="#cbc6b9"/>
+<text class="edgeLabel" text-anchor="middle" x="1520" y="204">Super1 dmg=36</text>
+<rect class="node" x="8" y="77" width="164" height="96" rx="7" fill="#ffffff"/>
+<text text-anchor="middle" x="90" y="97">#0 depth 0</text>
+<text class="tiny" text-anchor="middle" x="90" y="115">Grounded / Neutral</text>
+<text class="tiny" text-anchor="middle" x="90" y="131">act 0 hitstun 0 cancel 0</text>
+<text class="tiny" text-anchor="middle" x="90" y="147">m 2 scale 0 juggle 0 last 0</text>
+<rect class="node" x="268" y="77" width="164" height="96" rx="7" fill="#ffffff"/>
+<text text-anchor="middle" x="350" y="97">#1 depth 1</text>
+<text class="tiny" text-anchor="middle" x="350" y="115">Grounded / Grounded</text>
+<text class="tiny" text-anchor="middle" x="350" y="131">act 14 hitstun 24 cancel 8</text>
+<text class="tiny" text-anchor="middle" x="350" y="147">m 2 scale 1 juggle 1 last 2</text>
+<rect class="node" x="528" y="77" width="164" height="96" rx="7" fill="#ffffff"/>
+<text text-anchor="middle" x="610" y="97">#2 depth 2</text>
+<text class="tiny" text-anchor="middle" x="610" y="115">Grounded / Grounded</text>
+<text class="tiny" text-anchor="middle" x="610" y="131">act 20 hitstun 28 cancel 8</text>
+<text class="tiny" text-anchor="middle" x="610" y="147">m 2 scale 3 juggle 3 last 3</text>
+<rect class="node" x="788" y="77" width="164" height="96" rx="7" fill="#ffffff"/>
+<text text-anchor="middle" x="870" y="97">#3 depth 3</text>
+<text class="tiny" text-anchor="middle" x="870" y="115">Airborne / Airborne</text>
+<text class="tiny" text-anchor="middle" x="870" y="131">act 24 hitstun 40 cancel 9</text>
+<text class="tiny" text-anchor="middle" x="870" y="147">m 2 scale 5 juggle 5 last 4</text>
+<rect class="node" x="1048" y="77" width="164" height="96" rx="7" fill="#ffffff"/>
+<text text-anchor="middle" x="1130" y="97">#4 depth 4</text>
+<text class="tiny" text-anchor="middle" x="1130" y="115">Airborne / Airborne</text>
+<text class="tiny" text-anchor="middle" x="1130" y="131">act 12 hitstun 30 cancel 7</text>
+<text class="tiny" text-anchor="middle" x="1130" y="147">m 2 scale 6 juggle 6 last 5</text>
+<rect class="node" x="1308" y="77" width="164" height="96" rx="7" fill="#ffffff"/>
+<text text-anchor="middle" x="1390" y="97">#5 depth 5</text>
+<text class="tiny" text-anchor="middle" x="1390" y="115">Airborne / Airborne</text>
+<text class="tiny" text-anchor="middle" x="1390" y="131">act 16 hitstun 32 cancel 6</text>
+<text class="tiny" text-anchor="middle" x="1390" y="147">m 2 scale 8 juggle 7 last 6</text>
+<rect class="node" x="1308" y="227" width="164" height="96" rx="7" fill="#ffffff"/>
+<text text-anchor="middle" x="1390" y="247">#6 depth 5</text>
+<text class="tiny" text-anchor="middle" x="1390" y="265">Grounded / WallSplat</text>
+<text class="tiny" text-anchor="middle" x="1390" y="281">act 22 hitstun 58 cancel 8</text>
+<text class="tiny" text-anchor="middle" x="1390" y="297">m 2 scale 8 juggle 8 last 7</text>
+<rect class="node" x="1568" y="77" width="164" height="96" rx="7" fill="#d7eadf"/>
+<text text-anchor="middle" x="1650" y="97">#7 depth 6</text>
+<text class="tiny" text-anchor="middle" x="1650" y="115">Grounded / Knockdown</text>
+<text class="tiny" text-anchor="middle" x="1650" y="131">act 0 hitstun 0 cancel 0</text>
+<text class="tiny" text-anchor="middle" x="1650" y="147">m 0 scale 8 juggle 8 last 8</text>
+</svg>
