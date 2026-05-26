@@ -1,0 +1,1543 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ComboLens Frame Debugger</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #171717;
+      --muted: #5f6368;
+      --line: #cfd4d8;
+      --panel: #f7f5ef;
+      --tool: #ffffff;
+      --stage: #ece7da;
+      --self: #2869a8;
+      --opp: #92722d;
+      --hurt: #1e9d72;
+      --hit: #c7372f;
+      --active: #ffc857;
+      --focus: #2f7d66;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: #ded9ce;
+      overflow: hidden;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .app {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid #b9b4a9;
+      background: var(--tool);
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      min-width: 160px;
+      margin-right: 6px;
+    }
+
+    .brand strong {
+      font-size: 15px;
+      line-height: 1.15;
+    }
+
+    .brand span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.2;
+    }
+
+    .toolbar,
+    .command-panel,
+    .toggles {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar {
+      padding-right: 8px;
+      border-right: 1px solid var(--line);
+    }
+
+    .tool-button,
+    .move-button {
+      min-height: 34px;
+      border: 1px solid #aeb4b7;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .tool-button {
+      min-width: 42px;
+      padding: 0 10px;
+    }
+
+    .move-button {
+      min-width: 58px;
+      padding: 0 9px;
+    }
+
+    .tool-button:hover,
+    .move-button:hover,
+    .toggle:hover {
+      border-color: var(--focus);
+    }
+
+    .tool-button.is-running {
+      background: #d9efe7;
+      border-color: var(--focus);
+    }
+
+    .move-button.is-current {
+      background: #ffe8a8;
+      border-color: #9c7312;
+    }
+
+    .command-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      min-width: 74px;
+      padding: 0 10px;
+      border: 1px solid #b8bec1;
+      border-radius: 6px;
+      background: #fff;
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .command-list {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      color: #3b3f42;
+      font-size: 12px;
+    }
+
+    .command-token {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 7px;
+      border: 1px solid #c3c9cc;
+      border-radius: 5px;
+      background: #f7f9f8;
+      white-space: nowrap;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 34px;
+      padding: 0 8px;
+      border: 1px solid #b8bec1;
+      border-radius: 6px;
+      background: #fff;
+      color: #242424;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .toggle input {
+      width: 15px;
+      height: 15px;
+      margin: 0;
+      accent-color: var(--focus);
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: minmax(360px, 1fr) 320px;
+      min-height: 0;
+    }
+
+    .stage-wrap {
+      display: grid;
+      grid-template-rows: minmax(280px, 1fr) auto;
+      min-width: 0;
+      min-height: 0;
+      background: var(--stage);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 280px;
+      background: var(--stage);
+    }
+
+    .timeline {
+      height: 96px;
+      border-top: 1px solid #b9b4a9;
+      background: #f3f1ea;
+      padding: 10px 14px;
+      overflow: hidden;
+    }
+
+    .timeline-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .timeline-strip {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(3px, 1fr);
+      gap: 2px;
+      height: 42px;
+    }
+
+    .tick {
+      min-width: 3px;
+      height: 42px;
+      border-radius: 2px;
+      background: #c8c3b7;
+    }
+
+    .tick.startup {
+      background: #7b8da5;
+    }
+
+    .tick.active {
+      background: var(--active);
+    }
+
+    .tick.recovery {
+      background: #a98d57;
+    }
+
+    .tick.hitstun {
+      background: #b65c7a;
+    }
+
+    .tick.hitstop {
+      background: #202020;
+    }
+
+    .tick.hit {
+      outline: 2px solid var(--hit);
+      outline-offset: -2px;
+    }
+
+    .inspector {
+      min-width: 0;
+      min-height: 0;
+      overflow: auto;
+      border-left: 1px solid #b9b4a9;
+      background: var(--panel);
+      padding: 14px;
+    }
+
+    .section {
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid #cbc6b9;
+    }
+
+    .section:last-child {
+      border-bottom: 0;
+      margin-bottom: 0;
+    }
+
+    .section h2 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      color: #49443b;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: minmax(92px, auto) minmax(0, 1fr);
+      column-gap: 12px;
+      row-gap: 6px;
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .stat-grid dt {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .stat-grid dd {
+      margin: 0;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .meter-row {
+      display: grid;
+      grid-template-columns: 68px 1fr 42px;
+      gap: 8px;
+      align-items: center;
+      margin: 8px 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .meter-row input {
+      width: 100%;
+      accent-color: var(--focus);
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 12px;
+      color: #3c3c3c;
+    }
+
+    .swatch {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      margin-right: 6px;
+      border: 1px solid rgba(0, 0, 0, 0.25);
+      vertical-align: -2px;
+    }
+
+    .self-swatch {
+      background: rgba(40, 105, 168, 0.35);
+    }
+
+    .opp-swatch {
+      background: rgba(146, 114, 45, 0.35);
+    }
+
+    .hurt-swatch {
+      background: rgba(30, 157, 114, 0.30);
+    }
+
+    .hit-swatch {
+      background: rgba(199, 55, 47, 0.35);
+    }
+
+    @media (max-width: 860px) {
+      body {
+        overflow: auto;
+      }
+
+      .app {
+        min-height: 100%;
+        height: auto;
+      }
+
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .stage-wrap {
+        height: 68vh;
+      }
+
+      .inspector {
+        border-left: 0;
+        border-top: 1px solid #b9b4a9;
+      }
+
+      .command-list {
+        order: 10;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <strong>Frame Debugger</strong>
+        <span>ComboLens v1</span>
+      </div>
+      <div class="toolbar">
+        <button class="tool-button is-running" id="playPause" type="button" title="Pause or resume">Pause</button>
+        <button class="tool-button" id="step" type="button" title="Advance one frame">Step</button>
+        <button class="tool-button" id="reset" type="button" title="Reset state">Reset</button>
+      </div>
+      <div class="command-panel">
+        <span class="command-pill" id="commandReadout">5</span>
+        <button class="move-button" id="superButton" type="button" title="Super">Super</button>
+      </div>
+      <div class="command-list" aria-label="Command list">
+        <span class="command-token">S+U 2M</span>
+        <span class="command-token">A/D+I 5H</span>
+        <span class="command-token">S+U/I 2M/2H</span>
+        <span class="command-token">air U jM</span>
+        <span class="command-token">air I jH</span>
+        <span class="command-token">S,D,I 236H</span>
+        <span class="command-token">O/P Super</span>
+        <span class="command-token">10f buffer</span>
+      </div>
+      <div class="toggles">
+        <label class="toggle"><input id="showHitboxes" type="checkbox" checked>Hitbox</label>
+        <label class="toggle"><input id="showHurtboxes" type="checkbox" checked>Hurtbox</label>
+        <label class="toggle"><input id="showVelocity" type="checkbox" checked>Velocity</label>
+      </div>
+    </header>
+
+    <section class="content">
+      <div class="stage-wrap">
+        <canvas id="stage" width="1280" height="720"></canvas>
+        <div class="timeline">
+          <div class="timeline-head">
+            <span>Recent frames</span>
+            <span id="timelineLabel">0</span>
+          </div>
+          <div class="timeline-strip" id="timelineStrip"></div>
+        </div>
+      </div>
+
+      <aside class="inspector">
+        <section class="section">
+          <h2>Frame</h2>
+          <dl class="stat-grid" id="frameStats"></dl>
+        </section>
+        <section class="section">
+          <h2>Self</h2>
+          <dl class="stat-grid" id="selfStats"></dl>
+        </section>
+        <section class="section">
+          <h2>Opponent</h2>
+          <dl class="stat-grid" id="oppStats"></dl>
+        </section>
+        <section class="section">
+          <h2>State</h2>
+          <label class="meter-row">
+            <span>Distance</span>
+            <input id="distanceSlider" type="range" min="20" max="260" value="60">
+            <output id="distanceValue">60</output>
+          </label>
+          <dl class="stat-grid" id="comboStats"></dl>
+        </section>
+        <section class="section">
+          <h2>Legend</h2>
+          <div class="legend">
+            <span><i class="swatch self-swatch"></i>Self</span>
+            <span><i class="swatch opp-swatch"></i>Opponent</span>
+            <span><i class="swatch hurt-swatch"></i>Hurtbox</span>
+            <span><i class="swatch hit-swatch"></i>Hitbox</span>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    "use strict";
+
+    const STAGE_LEFT = 0;
+    const STAGE_RIGHT = 1000;
+    const FLOOR_Y = 0;
+    const MAX_METER = 300;
+    const MAX_SCALING_BUCKET = 8;
+    const MAX_JUGGLE = 10;
+
+    const BodyState = {
+      Grounded: "Grounded",
+      Airborne: "Airborne",
+      Knockdown: "Knockdown"
+    };
+
+    const ActionPhase = {
+      Idle: "Idle",
+      Startup: "Startup",
+      Active: "Active",
+      Recovery: "Recovery",
+      Hitstun: "Hitstun",
+      Knockdown: "Knockdown"
+    };
+
+    const moves = [
+      {
+        id: 2,
+        name: "2M",
+        label: "Crouching Medium",
+        startup: 7,
+        active: 3,
+        recovery: 14,
+        requiresGroundedSelf: true,
+        requiresGroundedOpponent: true,
+        hitboxes: [{ startFrame: 7, endFrame: 9, boxLocal: { x: 20, y: 20, w: 60, h: 22 } }],
+        onHit: { damage: 40, hitstun: 24, hitstop: 4, launchVelocity: { x: 0.8, y: 0 }, meterGain: 20, meterCost: 0, scalingStep: 1, juggleCost: 1 }
+      },
+      {
+        id: 3,
+        name: "5H",
+        label: "Standing Heavy",
+        startup: 10,
+        active: 4,
+        recovery: 20,
+        requiresGroundedSelf: true,
+        requiresGroundedOpponent: true,
+        hitboxes: [{ startFrame: 10, endFrame: 13, boxLocal: { x: 22, y: 28, w: 78, h: 30 } }],
+        onHit: { damage: 70, hitstun: 28, hitstop: 5, launchVelocity: { x: 1.0, y: 0 }, meterGain: 20, meterCost: 0, scalingStep: 2, juggleCost: 2 }
+      },
+      {
+        id: 4,
+        name: "2H",
+        label: "Launcher",
+        startup: 11,
+        active: 4,
+        recovery: 24,
+        requiresGroundedSelf: true,
+        requiresGroundedOpponent: true,
+        hitboxes: [{ startFrame: 11, endFrame: 14, boxLocal: { x: 18, y: 25, w: 70, h: 65 } }],
+        onHit: { damage: 65, hitstun: 40, hitstop: 5, launchVelocity: { x: 1.1, y: 8.5 }, meterGain: 20, meterCost: 0, scalingStep: 2, juggleCost: 2, selfBecomesAirborne: true }
+      },
+      {
+        id: 5,
+        name: "jM",
+        label: "Jump Medium",
+        startup: 6,
+        active: 4,
+        recovery: 12,
+        requiresAirborneSelf: true,
+        requiresAirborneOpponent: true,
+        hitboxes: [{ startFrame: 6, endFrame: 9, boxLocal: { x: 15, y: 20, w: 75, h: 45 } }],
+        onHit: { damage: 38, hitstun: 30, hitstop: 4, launchVelocity: { x: 1.0, y: 5.2 }, meterGain: 15, meterCost: 0, scalingStep: 1, juggleCost: 1 }
+      },
+      {
+        id: 6,
+        name: "jH",
+        label: "Jump Heavy",
+        startup: 8,
+        active: 4,
+        recovery: 16,
+        requiresAirborneSelf: true,
+        requiresAirborneOpponent: true,
+        hitboxes: [{ startFrame: 8, endFrame: 11, boxLocal: { x: 18, y: 18, w: 90, h: 50 } }],
+        onHit: { damage: 60, hitstun: 32, hitstop: 4, launchVelocity: { x: 1.1, y: 2.8 }, meterGain: 15, meterCost: 0, scalingStep: 2, juggleCost: 1 }
+      },
+      {
+        id: 7,
+        name: "236H",
+        label: "Heavy Wall Special",
+        startup: 10,
+        active: 5,
+        recovery: 22,
+        requiresAirborneSelf: true,
+        requiresAirborneOpponent: true,
+        hitboxes: [{ startFrame: 10, endFrame: 14, boxLocal: { x: 20, y: 15, w: 120, h: 60 } }],
+        onHit: { damage: 90, hitstun: 38, hitstop: 6, launchVelocity: { x: 10.0, y: -1.0 }, meterGain: 20, meterCost: 0, scalingStep: 2, juggleCost: 2, causesWallSplat: true, usesWallBounce: true, selfBecomesGrounded: true }
+      },
+      {
+        id: 8,
+        name: "Super1",
+        label: "One-Bar Super",
+        startup: 5,
+        active: 8,
+        recovery: 40,
+        requiresGroundedSelf: true,
+        requiresWallSplatOpponent: true,
+        meterCost: 100,
+        hitboxes: [{ startFrame: 5, endFrame: 12, boxLocal: { x: 20, y: 0, w: 260, h: 110 } }],
+        onHit: { damage: 180, hitstun: 0, hitstop: 8, launchVelocity: { x: 0, y: 0 }, meterGain: 0, meterCost: 100, scalingStep: 0, juggleCost: 0, causesKnockdown: true }
+      }
+    ];
+
+    const moveById = new Map(moves.map((move) => [move.id, move]));
+    const moveByName = new Map(moves.map((move) => [move.name, move]));
+    const keys = new Set();
+    const inputHistoryLimit = 40;
+    const inputBufferFrames = 10;
+    const timelineLimit = 180;
+    let paused = false;
+    let timeline = [];
+    let inputHistory = [];
+    let bufferedInput = null;
+    let lastDirection = "5";
+    let lastCommand = "5";
+    let lastInputResult = "Ready";
+    let hitFlash = 0;
+    let lastTime = performance.now();
+    let frameCarry = 0;
+
+    const canvas = document.getElementById("stage");
+    const ctx = canvas.getContext("2d");
+    const playPause = document.getElementById("playPause");
+    const stepButton = document.getElementById("step");
+    const resetButton = document.getElementById("reset");
+    const commandReadout = document.getElementById("commandReadout");
+    const superButton = document.getElementById("superButton");
+    const showHitboxes = document.getElementById("showHitboxes");
+    const showHurtboxes = document.getElementById("showHurtboxes");
+    const showVelocity = document.getElementById("showVelocity");
+    const frameStats = document.getElementById("frameStats");
+    const selfStats = document.getElementById("selfStats");
+    const oppStats = document.getElementById("oppStats");
+    const comboStats = document.getElementById("comboStats");
+    const timelineStrip = document.getElementById("timelineStrip");
+    const timelineLabel = document.getElementById("timelineLabel");
+    const distanceSlider = document.getElementById("distanceSlider");
+    const distanceValue = document.getElementById("distanceValue");
+
+    let state = makeInitialFrameState();
+
+    function clamp(value, lo, hi) {
+      return Math.max(lo, Math.min(value, hi));
+    }
+
+    function characterState(x, facingRight) {
+      return {
+        pos: { x, y: 0 },
+        vel: { x: 0, y: 0 },
+        body: BodyState.Grounded,
+        phase: ActionPhase.Idle,
+        currentMove: 0,
+        moveFrame: 0,
+        hitstunRemaining: 0,
+        hitstopRemaining: 0,
+        recoveryRemaining: 0,
+        facingRight,
+        hurtboxLocal: { x: -15, y: 0, w: 30, h: 80 },
+        moveAlreadyHit: false
+      };
+    }
+
+    function makeInitialFrameState() {
+      const distance = Number(distanceSlider ? distanceSlider.value : 60);
+      return {
+        self: characterState(760, true),
+        opp: characterState(760 + distance, false),
+        globalFrame: 0,
+        meter: 100,
+        scalingBucket: 0,
+        juggle: 0,
+        wallBounceUsed: false,
+        groundBounceUsed: false,
+        opponentWallSplat: false,
+        lastMove: 0,
+        totalDamage: 0,
+        comboHits: 0,
+        comboDamage: 0,
+        lastComboHits: 0,
+        lastComboDamage: 0,
+        maxComboHits: 0,
+        comboDisplayTimer: 0
+      };
+    }
+
+    function resetState() {
+      state = makeInitialFrameState();
+      timeline = [];
+      inputHistory = [];
+      bufferedInput = null;
+      lastDirection = "5";
+      lastCommand = "5";
+      lastInputResult = "Ready";
+      hitFlash = 0;
+      updateMoveButtons();
+      render();
+    }
+
+    function flippedLocalRect(local) {
+      return { x: -local.x - local.w, y: local.y, w: local.w, h: local.h };
+    }
+
+    function worldRect(local, character) {
+      const authored = character.facingRight ? local : flippedLocalRect(local);
+      return {
+        x: character.pos.x + authored.x,
+        y: character.pos.y + authored.y,
+        w: authored.w,
+        h: authored.h
+      };
+    }
+
+    function worldHurtbox(character) {
+      return worldRect(character.hurtboxLocal, character);
+    }
+
+    function overlaps(a, b) {
+      return a.x < b.x + b.w &&
+        a.x + a.w > b.x &&
+        a.y < b.y + b.h &&
+        a.y + a.h > b.y;
+    }
+
+    function activeHitboxes(character, move) {
+      if (!move) return [];
+      return move.hitboxes
+        .filter((hitbox) => character.moveFrame >= hitbox.startFrame && character.moveFrame <= hitbox.endFrame)
+        .map((hitbox) => worldRect(hitbox.boxLocal, character));
+    }
+
+    function checkHit() {
+      const move = moveById.get(state.self.currentMove);
+      if (!move) return false;
+      const oppHurt = worldHurtbox(state.opp);
+      return activeHitboxes(state.self, move).some((hitbox) => overlaps(hitbox, oppHurt));
+    }
+
+    function updateMotion(character, settings) {
+      character.pos.x += character.vel.x;
+      character.pos.y += character.vel.y;
+
+      if (character.body === BodyState.Airborne) {
+        character.vel.y += settings.gravity;
+        character.vel.x *= settings.airFriction;
+      } else {
+        character.vel.x *= settings.groundFriction;
+      }
+
+      if (character.pos.y <= FLOOR_Y) {
+        character.pos.y = FLOOR_Y;
+        if (character.vel.y < 0) character.vel.y = 0;
+        if (character.body === BodyState.Airborne) {
+          character.body = BodyState.Grounded;
+        }
+      }
+
+      character.pos.x = clamp(character.pos.x, STAGE_LEFT, STAGE_RIGHT);
+    }
+
+    function updateTimers(character) {
+      if (character.hitstunRemaining > 0) {
+        character.hitstunRemaining -= 1;
+        character.phase = character.hitstunRemaining > 0 ? ActionPhase.Hitstun : ActionPhase.Idle;
+      }
+      if (character.recoveryRemaining > 0) {
+        character.recoveryRemaining -= 1;
+        if (character.recoveryRemaining === 0 && character.phase === ActionPhase.Recovery) {
+          character.phase = ActionPhase.Idle;
+        }
+      }
+    }
+
+    function applyHit(move) {
+      const hit = move.onHit;
+      const facingSign = state.self.facingRight ? 1 : -1;
+      const scaledDamage = Math.max(1, Math.round(hit.damage * (1 - state.scalingBucket * 0.1)));
+      const connectsToCurrentCombo = state.comboHits === 0 || opponentInComboHitstun();
+
+      if (!connectsToCurrentCombo) {
+        state.comboHits = 0;
+        state.comboDamage = 0;
+      }
+
+      state.opp.hitstunRemaining = hit.hitstun;
+      state.opp.phase = ActionPhase.Hitstun;
+      state.opp.hitstopRemaining = hit.hitstop;
+      state.self.hitstopRemaining = hit.hitstop;
+      state.opp.vel = { x: hit.launchVelocity.x * facingSign, y: hit.launchVelocity.y };
+
+      if (hit.launchVelocity.y > 0 || state.opp.pos.y > FLOOR_Y) {
+        state.opp.body = BodyState.Airborne;
+      }
+
+      if (hit.selfBecomesAirborne) {
+        state.self.body = BodyState.Airborne;
+        state.self.pos.y = Math.max(state.self.pos.y, 60);
+        state.self.vel.y = Math.max(state.self.vel.y, 2);
+      }
+
+      if (hit.selfBecomesGrounded) {
+        state.self.body = BodyState.Grounded;
+        state.self.pos.y = 0;
+        state.self.vel.y = 0;
+      }
+
+      state.self.recoveryRemaining = move.recovery;
+      state.self.phase = ActionPhase.Recovery;
+      state.meter = clamp(state.meter + (hit.meterGain || 0) - (hit.meterCost || 0), 0, MAX_METER);
+      state.scalingBucket = clamp(state.scalingBucket + (hit.scalingStep || 0), 0, MAX_SCALING_BUCKET);
+      state.juggle = clamp(state.juggle + (hit.juggleCost || 0), 0, MAX_JUGGLE);
+      state.totalDamage += scaledDamage;
+      state.comboHits += 1;
+      state.comboDamage += scaledDamage;
+      state.lastComboHits = state.comboHits;
+      state.lastComboDamage = state.comboDamage;
+      state.maxComboHits = Math.max(state.maxComboHits, state.comboHits);
+      state.comboDisplayTimer = 120;
+
+      if (hit.usesWallBounce) state.wallBounceUsed = true;
+      if (hit.usesGroundBounce) state.groundBounceUsed = true;
+
+      if (hit.causesWallSplat) {
+        const distLeft = Math.abs(state.opp.pos.x - STAGE_LEFT);
+        const distRight = Math.abs(STAGE_RIGHT - state.opp.pos.x);
+        state.opp.pos.x = distLeft < distRight ? STAGE_LEFT + 25 : STAGE_RIGHT - 25;
+        state.opponentWallSplat = true;
+        state.opp.body = BodyState.Grounded;
+        state.opp.phase = ActionPhase.Hitstun;
+        state.opp.vel = { x: 0, y: 0 };
+        state.opp.pos.y = 0;
+        state.opp.hitstunRemaining += 20;
+        state.wallBounceUsed = true;
+      }
+
+      if (hit.causesKnockdown) {
+        state.opp.body = BodyState.Knockdown;
+        state.opp.phase = ActionPhase.Knockdown;
+        state.opp.hitstunRemaining = 0;
+        state.opp.vel = { x: 0, y: 0 };
+      }
+
+      state.lastMove = move.id;
+      hitFlash = 8;
+    }
+
+    function opponentInComboHitstun() {
+      return state.opp.hitstunRemaining > 0 ||
+        state.opp.hitstopRemaining > 0 ||
+        state.opp.phase === ActionPhase.Hitstun;
+    }
+
+    function resetComboIfFreshNeutral() {
+      if (opponentInComboHitstun()) {
+        if (state.comboHits === 0) return;
+        state.comboDisplayTimer = 120;
+        return;
+      }
+
+      if (state.comboHits > 0) {
+        state.lastComboHits = state.comboHits;
+        state.lastComboDamage = state.comboDamage;
+        state.comboHits = 0;
+        state.comboDamage = 0;
+        state.comboDisplayTimer = 120;
+        return;
+      }
+
+      state.comboDisplayTimer = Math.max(0, state.comboDisplayTimer - 1);
+    }
+
+    function clearComboForNewNeutralAttempt() {
+      if (!opponentInComboHitstun()) {
+        state.comboHits = 0;
+        state.comboDamage = 0;
+        state.comboDisplayTimer = 0;
+      }
+    }
+
+    function currentMoveProgress(character) {
+      const move = moveById.get(character.currentMove);
+      if (!move) return;
+      const total = move.startup + move.active + move.recovery;
+      if (character.moveFrame >= total) {
+        character.phase = ActionPhase.Idle;
+        character.currentMove = 0;
+        character.moveFrame = 0;
+        character.moveAlreadyHit = false;
+        character.recoveryRemaining = 0;
+        return;
+      }
+
+      if (character.moveFrame < move.startup) {
+        character.phase = ActionPhase.Startup;
+      } else if (character.moveFrame < move.startup + move.active) {
+        character.phase = ActionPhase.Active;
+      } else {
+        character.phase = ActionPhase.Recovery;
+      }
+    }
+
+    function canStartMove() {
+      return state.self.hitstopRemaining === 0 &&
+        state.opp.hitstopRemaining === 0 &&
+        state.self.currentMove === 0 &&
+        state.self.phase !== ActionPhase.Hitstun &&
+        state.self.phase !== ActionPhase.Knockdown;
+    }
+
+    function moveRequirementError(move) {
+      if (move.requiresGroundedSelf && state.self.body !== BodyState.Grounded) {
+        return `${move.name}: grounded only`;
+      }
+      if (move.requiresAirborneSelf && state.self.body !== BodyState.Airborne) {
+        return `${move.name}: air only`;
+      }
+      if (move.requiresGroundedOpponent && state.opp.body !== BodyState.Grounded) {
+        return `${move.name}: grounded opp only`;
+      }
+      if (move.requiresAirborneOpponent && state.opp.body !== BodyState.Airborne) {
+        return `${move.name}: airborne opp only`;
+      }
+      if (move.requiresWallSplatOpponent && !state.opponentWallSplat) {
+        return `${move.name}: wall splat only`;
+      }
+      if (state.juggle + ((move.onHit && move.onHit.juggleCost) || 0) > MAX_JUGGLE) {
+        return `${move.name}: juggle cap`;
+      }
+      if ((move.meterCost || 0) > state.meter) {
+        return `${move.name}: meter`;
+      }
+      return "";
+    }
+
+    function bufferMove(move, command) {
+      bufferedInput = {
+        moveId: move.id,
+        command,
+        expiresAt: state.globalFrame + inputBufferFrames
+      };
+      lastInputResult = `${command}: buffered`;
+      updateMoveButtons();
+      return true;
+    }
+
+    function expireBufferedInput() {
+      if (!bufferedInput) return;
+      if (state.globalFrame <= bufferedInput.expiresAt) return;
+      lastInputResult = `${bufferedInput.command}: expired`;
+      bufferedInput = null;
+      updateMoveButtons();
+    }
+
+    function tryConsumeBufferedInput() {
+      expireBufferedInput();
+      if (!bufferedInput || !canStartMove()) return false;
+
+      const move = moveById.get(bufferedInput.moveId);
+      const command = bufferedInput.command;
+      if (!move) {
+        bufferedInput = null;
+        return false;
+      }
+
+      const requirementError = moveRequirementError(move);
+      if (requirementError) {
+        lastInputResult = requirementError;
+        bufferedInput = null;
+        updateMoveButtons();
+        return false;
+      }
+
+      bufferedInput = null;
+      return startMove(move, { command, buffer: false });
+    }
+
+    function bufferText() {
+      if (!bufferedInput) return "empty";
+      return `${bufferedInput.command} / ${Math.max(0, bufferedInput.expiresAt - state.globalFrame)}f`;
+    }
+
+    function startMove(move, options = {}) {
+      const command = options.command || move.name;
+      const allowBuffer = options.buffer !== false;
+      const requirementError = moveRequirementError(move);
+      if (requirementError) {
+        bufferedInput = null;
+        lastInputResult = requirementError;
+        updateMoveButtons();
+        return false;
+      }
+
+      if (!canStartMove()) {
+        if (allowBuffer) {
+          return bufferMove(move, command);
+        }
+        lastInputResult = "Busy";
+        return false;
+      }
+
+      clearComboForNewNeutralAttempt();
+      state.self.currentMove = move.id;
+      state.self.moveFrame = 0;
+      state.self.moveAlreadyHit = false;
+      state.self.phase = ActionPhase.Startup;
+      state.self.recoveryRemaining = move.startup + move.active + move.recovery;
+      lastCommand = command;
+      lastInputResult = move.name;
+      updateMoveButtons();
+      return true;
+    }
+
+    function currentDirection() {
+      const leftHeld = keys.has("KeyA");
+      const rightHeld = keys.has("KeyD");
+      const downHeld = keys.has("KeyS");
+      const upHeld = keys.has("KeyW");
+      const forwardHeld = state.self.facingRight ? rightHeld : leftHeld;
+      const backHeld = state.self.facingRight ? leftHeld : rightHeld;
+
+      if (upHeld && forwardHeld) return "9";
+      if (upHeld && backHeld) return "7";
+      if (upHeld) return "8";
+      if (downHeld && forwardHeld) return "3";
+      if (downHeld && backHeld) return "1";
+      if (downHeld) return "2";
+      if (forwardHeld) return "6";
+      if (backHeld) return "4";
+      return "5";
+    }
+
+    function pushDirection(direction) {
+      lastDirection = direction;
+      const previous = inputHistory[inputHistory.length - 1];
+      if (!previous || previous.direction !== direction) {
+        inputHistory.push({ direction, frame: state.globalFrame });
+      }
+      inputHistory = inputHistory.filter((entry) => state.globalFrame - entry.frame <= inputHistoryLimit);
+    }
+
+    function recentDirections() {
+      return inputHistory
+        .filter((entry) => state.globalFrame - entry.frame <= 24)
+        .map((entry) => entry.direction);
+    }
+
+    function hasRecent236() {
+      const directions = recentDirections();
+      let need = 0;
+      for (const direction of directions) {
+        if (need === 0 && direction === "2") {
+          need = 1;
+        } else if (need === 1 && direction === "3") {
+          need = 2;
+        } else if (need === 2 && direction === "6") {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function isDownDirection(direction) {
+      return direction === "1" || direction === "2" || direction === "3";
+    }
+
+    function isStandingHeavyDirection(direction) {
+      return direction === "4" || direction === "5" || direction === "6";
+    }
+
+    function resolveAttack(button) {
+      pushDirection(currentDirection());
+
+      let moveName = "";
+      const direction = lastDirection;
+      if (button === "M") {
+        moveName = state.self.body === BodyState.Airborne ? "jM" : (isDownDirection(direction) ? "2M" : "");
+      } else if (button === "H") {
+        if (hasRecent236()) {
+          moveName = "236H";
+        } else if (state.self.body === BodyState.Airborne) {
+          moveName = "jH";
+        } else if (isDownDirection(direction)) {
+          moveName = "2H";
+        } else if (isStandingHeavyDirection(direction)) {
+          moveName = "5H";
+        }
+      }
+
+      lastCommand = moveName || `${direction}${button}`;
+      const move = moveByName.get(moveName);
+      if (!move) {
+        lastInputResult = `${lastCommand}: no move`;
+        return false;
+      }
+      return startMove(move, { command: lastCommand });
+    }
+
+    function startSuper() {
+      lastCommand = "Super";
+      const move = moveByName.get("Super1");
+      return startMove(move, { command: lastCommand });
+    }
+
+    function applyControls() {
+      const moveSpeed = 4.25;
+      const oppSpeed = 3.25;
+      const freeSelf = state.self.hitstopRemaining === 0 && state.self.phase !== ActionPhase.Hitstun && state.self.phase !== ActionPhase.Knockdown;
+      const freeOpp = state.opp.hitstopRemaining === 0 && state.opp.phase !== ActionPhase.Knockdown;
+
+      if (freeSelf) {
+        if (keys.has("KeyA")) {
+          state.self.vel.x = -moveSpeed;
+          state.self.facingRight = false;
+        }
+        if (keys.has("KeyD")) {
+          state.self.vel.x = moveSpeed;
+          state.self.facingRight = true;
+        }
+        if (keys.has("KeyW") && state.self.body === BodyState.Grounded) {
+          state.self.body = BodyState.Airborne;
+          state.self.vel.y = 8.5;
+        }
+      }
+
+      if (freeOpp) {
+        if (keys.has("ArrowLeft")) {
+          state.opp.vel.x = -oppSpeed;
+          state.opp.facingRight = false;
+        }
+        if (keys.has("ArrowRight")) {
+          state.opp.vel.x = oppSpeed;
+          state.opp.facingRight = true;
+        }
+        if (keys.has("ArrowUp") && state.opp.body === BodyState.Grounded) {
+          state.opp.body = BodyState.Airborne;
+          state.opp.vel.y = 8;
+        }
+      }
+
+      state.self.facingRight = state.self.pos.x <= state.opp.pos.x;
+      state.opp.facingRight = state.opp.pos.x < state.self.pos.x;
+      pushDirection(currentDirection());
+    }
+
+    function stepFrame() {
+      const settings = {
+        gravity: -0.38,
+        groundFriction: 0.75,
+        airFriction: 0.99
+      };
+
+      applyControls();
+
+      const frozen = state.self.hitstopRemaining > 0 || state.opp.hitstopRemaining > 0;
+      if (frozen) {
+        state.self.hitstopRemaining = Math.max(0, state.self.hitstopRemaining - 1);
+        state.opp.hitstopRemaining = Math.max(0, state.opp.hitstopRemaining - 1);
+        expireBufferedInput();
+        captureFrame(false, true);
+        state.globalFrame += 1;
+        return;
+      }
+
+      currentMoveProgress(state.self);
+      tryConsumeBufferedInput();
+      updateMotion(state.self, settings);
+      updateMotion(state.opp, settings);
+      updateTimers(state.opp);
+
+      const move = moveById.get(state.self.currentMove);
+      let hitThisFrame = false;
+      if (move && !state.self.moveAlreadyHit && state.self.phase === ActionPhase.Active && checkHit()) {
+        applyHit(move);
+        state.self.moveAlreadyHit = true;
+        hitThisFrame = true;
+      }
+
+      captureFrame(hitThisFrame, false);
+
+      if (state.self.currentMove !== 0) {
+        state.self.moveFrame += 1;
+      }
+      if (hitFlash > 0) hitFlash -= 1;
+      resetComboIfFreshNeutral();
+      state.globalFrame += 1;
+    }
+
+    function captureFrame(hitConnected, hitstop) {
+      const move = moveById.get(state.self.currentMove);
+      timeline.push({
+        frame: state.globalFrame,
+        phase: hitstop ? "hitstop" : state.self.phase.toLowerCase(),
+        hitConnected,
+        moveName: move ? move.name : "NONE",
+        moveFrame: state.self.moveFrame,
+        hitstop: Math.max(state.self.hitstopRemaining, state.opp.hitstopRemaining)
+      });
+      if (timeline.length > timelineLimit) {
+        timeline = timeline.slice(timeline.length - timelineLimit);
+      }
+    }
+
+    function fitCanvas() {
+      const ratio = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      const width = Math.max(320, Math.floor(rect.width * ratio));
+      const height = Math.max(260, Math.floor(rect.height * ratio));
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+      }
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      return { width: rect.width, height: rect.height };
+    }
+
+    function viewportMetrics(size) {
+      const padX = 44;
+      const padTop = 28;
+      const padBottom = 54;
+      const scale = Math.min((size.width - padX * 2) / 1000, (size.height - padTop - padBottom) / 320);
+      const floor = size.height - padBottom;
+      return {
+        padX,
+        floor,
+        scale: Math.max(0.28, scale)
+      };
+    }
+
+    function wx(x, metrics) {
+      return metrics.padX + x * metrics.scale;
+    }
+
+    function wy(y, metrics) {
+      return metrics.floor - y * metrics.scale;
+    }
+
+    function drawWorldRect(rect, metrics, fill, stroke, lineWidth) {
+      const x = wx(rect.x, metrics);
+      const y = wy(rect.y + rect.h, metrics);
+      const w = rect.w * metrics.scale;
+      const h = rect.h * metrics.scale;
+      ctx.fillStyle = fill;
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = lineWidth;
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeRect(x, y, w, h);
+    }
+
+    function drawCharacter(character, metrics, color) {
+      const hurt = worldHurtbox(character);
+      const center = wx(character.pos.x, metrics);
+      const floor = wy(character.pos.y, metrics);
+      const facing = character.facingRight ? 1 : -1;
+
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.92;
+      ctx.fillRect(center - 9, floor - 62 * metrics.scale, 18, 62 * metrics.scale);
+      ctx.beginPath();
+      ctx.arc(center, floor - 78 * metrics.scale, 11, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(center, floor - 38 * metrics.scale);
+      ctx.lineTo(center + facing * 24 * metrics.scale, floor - 22 * metrics.scale);
+      ctx.stroke();
+
+      if (showHurtboxes.checked) {
+        drawWorldRect(hurt, metrics, "rgba(30, 157, 114, 0.22)", "rgba(30, 157, 114, 0.88)", 2);
+      }
+
+      if (showVelocity.checked) {
+        drawVelocity(character, metrics, color);
+      }
+    }
+
+    function drawVelocity(character, metrics, color) {
+      const startX = wx(character.pos.x, metrics);
+      const startY = wy(character.pos.y + 96, metrics);
+      const endX = startX + character.vel.x * 12;
+      const endY = startY - character.vel.y * 12;
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX, endY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(endX, endY, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawStage(size, metrics) {
+      ctx.clearRect(0, 0, size.width, size.height);
+      ctx.fillStyle = "#ece7da";
+      ctx.fillRect(0, 0, size.width, size.height);
+
+      ctx.strokeStyle = "rgba(80, 76, 68, 0.18)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= 1000; x += 100) {
+        const screenX = wx(x, metrics);
+        ctx.beginPath();
+        ctx.moveTo(screenX, wy(0, metrics));
+        ctx.lineTo(screenX, wy(300, metrics));
+        ctx.stroke();
+      }
+      for (let y = 0; y <= 300; y += 50) {
+        const screenY = wy(y, metrics);
+        ctx.beginPath();
+        ctx.moveTo(wx(0, metrics), screenY);
+        ctx.lineTo(wx(1000, metrics), screenY);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = "#312f2a";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(wx(STAGE_LEFT, metrics), wy(FLOOR_Y, metrics));
+      ctx.lineTo(wx(STAGE_RIGHT, metrics), wy(FLOOR_Y, metrics));
+      ctx.stroke();
+
+      ctx.strokeStyle = "#6e6658";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(wx(STAGE_LEFT, metrics), wy(FLOOR_Y, metrics));
+      ctx.lineTo(wx(STAGE_LEFT, metrics), wy(260, metrics));
+      ctx.moveTo(wx(STAGE_RIGHT, metrics), wy(FLOOR_Y, metrics));
+      ctx.lineTo(wx(STAGE_RIGHT, metrics), wy(260, metrics));
+      ctx.stroke();
+    }
+
+    function drawOverlay(size) {
+      const hitstop = Math.max(state.self.hitstopRemaining, state.opp.hitstopRemaining);
+      if (hitstop <= 0 && hitFlash <= 0) return;
+
+      ctx.fillStyle = hitstop > 0 ? "rgba(255, 200, 87, 0.16)" : "rgba(199, 55, 47, 0.12)";
+      ctx.fillRect(0, 0, size.width, size.height);
+
+      if (hitstop > 0) {
+        ctx.fillStyle = "#171717";
+        ctx.font = "700 28px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`HITSTOP ${hitstop}`, size.width / 2, 48);
+      }
+    }
+
+    function drawHud(metrics) {
+      const move = moveById.get(state.self.currentMove);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.82)";
+      ctx.strokeStyle = "rgba(49, 47, 42, 0.2)";
+      ctx.lineWidth = 1;
+      ctx.fillRect(18, 18, 248, 76);
+      ctx.strokeRect(18, 18, 248, 76);
+      ctx.fillStyle = "#171717";
+      ctx.font = "700 15px Inter, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(move ? `${move.name} / ${state.self.phase}` : state.self.phase, 30, 44);
+      ctx.font = "13px Inter, sans-serif";
+      ctx.fillText(`Frame ${state.globalFrame}   Move ${state.self.moveFrame}`, 30, 68);
+      ctx.fillText(`x ${state.self.pos.x.toFixed(1)} -> ${state.opp.pos.x.toFixed(1)}`, 30, 88);
+
+      const displayHits = state.comboHits > 0 ? state.comboHits : (state.comboDisplayTimer > 0 ? state.lastComboHits : 0);
+      const displayDamage = state.comboHits > 0 ? state.comboDamage : state.lastComboDamage;
+      if (displayHits > 0) {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.88)";
+        ctx.strokeStyle = "rgba(49, 47, 42, 0.2)";
+        ctx.fillRect(18, 106, 170, 60);
+        ctx.strokeRect(18, 106, 170, 60);
+        ctx.fillStyle = "#c7372f";
+        ctx.font = "700 24px Inter, sans-serif";
+        ctx.fillText(`${displayHits} HIT`, 30, 134);
+        ctx.fillStyle = "#171717";
+        ctx.font = "13px Inter, sans-serif";
+        ctx.fillText(`${displayDamage} damage`, 30, 154);
+      }
+
+      if (state.opponentWallSplat) {
+        ctx.fillStyle = "#633b00";
+        ctx.fillText("Wall splat", wx(820, metrics), wy(245, metrics));
+      }
+    }
+
+    function renderStage() {
+      const size = fitCanvas();
+      const metrics = viewportMetrics(size);
+      drawStage(size, metrics);
+      drawCharacter(state.self, metrics, "rgba(40, 105, 168, 0.92)");
+      drawCharacter(state.opp, metrics, "rgba(146, 114, 45, 0.92)");
+
+      if (showHitboxes.checked) {
+        const move = moveById.get(state.self.currentMove);
+        for (const hitbox of activeHitboxes(state.self, move)) {
+          drawWorldRect(hitbox, metrics, "rgba(199, 55, 47, 0.30)", "rgba(199, 55, 47, 0.95)", 2);
+        }
+      }
+
+      drawOverlay(size);
+      drawHud(metrics);
+    }
+
+    function setStats(element, rows) {
+      element.innerHTML = rows.map(([key, value]) => `<dt>${key}</dt><dd>${value}</dd>`).join("");
+    }
+
+    function fmtVec(vec) {
+      return `${vec.x.toFixed(2)}, ${vec.y.toFixed(2)}`;
+    }
+
+    function moveName(id) {
+      return moveById.get(id)?.name || "NONE";
+    }
+
+    function renderInspector() {
+      const move = moveById.get(state.self.currentMove);
+      const hitstop = Math.max(state.self.hitstopRemaining, state.opp.hitstopRemaining);
+      setStats(frameStats, [
+        ["Global", state.globalFrame],
+        ["Move", move ? `${move.name} (${move.label})` : "NONE"],
+        ["Move frame", state.self.moveFrame],
+        ["Phase", state.self.phase],
+        ["Hitstop", hitstop],
+        ["Active boxes", activeHitboxes(state.self, move).length]
+      ]);
+
+      setStats(selfStats, [
+        ["Position", fmtVec(state.self.pos)],
+        ["Velocity", fmtVec(state.self.vel)],
+        ["Body", state.self.body],
+        ["Facing", state.self.facingRight ? "Right" : "Left"],
+        ["Recovery", state.self.recoveryRemaining],
+        ["Hurtbox", rectLabel(worldHurtbox(state.self))]
+      ]);
+
+      setStats(oppStats, [
+        ["Position", fmtVec(state.opp.pos)],
+        ["Velocity", fmtVec(state.opp.vel)],
+        ["Body", state.opp.body],
+        ["Phase", state.opp.phase],
+        ["Hitstun", state.opp.hitstunRemaining],
+        ["Hurtbox", rectLabel(worldHurtbox(state.opp))]
+      ]);
+
+      setStats(comboStats, [
+        ["Direction", lastDirection],
+        ["Command", lastCommand],
+        ["Input", lastInputResult],
+        ["Buffer", bufferText()],
+        ["Combo", state.comboHits > 0 ? `${state.comboHits} hit / ${state.comboDamage} dmg` : "0"],
+        ["Last combo", state.lastComboHits > 0 ? `${state.lastComboHits} hit / ${state.lastComboDamage} dmg` : "0"],
+        ["Max combo", state.maxComboHits],
+        ["Damage", state.totalDamage],
+        ["Meter", state.meter],
+        ["Scaling", state.scalingBucket],
+        ["Juggle", state.juggle],
+        ["Last move", moveName(state.lastMove)],
+        ["Wall bounce", state.wallBounceUsed ? "Used" : "Ready"],
+        ["Ground bounce", state.groundBounceUsed ? "Used" : "Ready"],
+        ["Wall splat", state.opponentWallSplat ? "Yes" : "No"]
+      ]);
+    }
+
+    function rectLabel(rect) {
+      return `${rect.x.toFixed(1)}, ${rect.y.toFixed(1)}, ${rect.w.toFixed(1)}, ${rect.h.toFixed(1)}`;
+    }
+
+    function renderTimeline() {
+      timelineLabel.textContent = `${timeline.length} / ${timelineLimit}`;
+      timelineStrip.innerHTML = timeline.map((tick) => {
+        const classes = ["tick", tick.phase];
+        if (tick.hitConnected) classes.push("hit");
+        const title = `f${tick.frame} ${tick.moveName} mf${tick.moveFrame} ${tick.phase}`;
+        return `<span class="${classes.join(" ")}" title="${title}"></span>`;
+      }).join("");
+    }
+
+    function render() {
+      renderStage();
+      renderInspector();
+      renderTimeline();
+    }
+
+    function updateMoveButtons() {
+      commandReadout.textContent = lastCommand;
+      superButton.classList.toggle("is-current", state.self.currentMove === moveByName.get("Super1").id);
+      playPause.textContent = paused ? "Play" : "Pause";
+      playPause.classList.toggle("is-running", !paused);
+    }
+
+    function bindCommandButtons() {
+      superButton.addEventListener("click", () => startSuper());
+    }
+
+    function handleKeyDown(event) {
+      if (event.target instanceof HTMLInputElement) return;
+      keys.add(event.code);
+
+      if (event.code === "KeyU" && !event.repeat) {
+        resolveAttack("M");
+      } else if (event.code === "KeyI" && !event.repeat) {
+        resolveAttack("H");
+      } else if ((event.code === "KeyO" || event.code === "KeyP") && !event.repeat) {
+        startSuper();
+      } else if (event.code === "Space") {
+        paused = !paused;
+        updateMoveButtons();
+        event.preventDefault();
+      } else if (event.code === "Period") {
+        stepFrame();
+        render();
+      } else if (event.code === "KeyR") {
+        resetState();
+      }
+    }
+
+    function handleKeyUp(event) {
+      keys.delete(event.code);
+    }
+
+    function frameLoop(time) {
+      const elapsed = time - lastTime;
+      lastTime = time;
+      frameCarry += elapsed;
+
+      while (!paused && frameCarry >= 1000 / 60) {
+        stepFrame();
+        frameCarry -= 1000 / 60;
+      }
+
+      render();
+      requestAnimationFrame(frameLoop);
+    }
+
+    playPause.addEventListener("click", () => {
+      paused = !paused;
+      updateMoveButtons();
+    });
+
+    stepButton.addEventListener("click", () => {
+      stepFrame();
+      render();
+    });
+
+    resetButton.addEventListener("click", resetState);
+
+    distanceSlider.addEventListener("input", () => {
+      distanceValue.textContent = distanceSlider.value;
+      const distance = Number(distanceSlider.value);
+      state.opp.pos.x = clamp(state.self.pos.x + distance, STAGE_LEFT, STAGE_RIGHT);
+      render();
+    });
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("resize", render);
+
+    bindCommandButtons();
+    resetState();
+    requestAnimationFrame(frameLoop);
+  </script>
+</body>
+</html>
