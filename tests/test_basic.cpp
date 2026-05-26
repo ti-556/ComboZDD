@@ -22,6 +22,12 @@ int main() {
     assert(first.hitVerified);
     assert(first.damage > 0);
 
+    MoveDef tooSlowHeavy = db.byId(db.idByName("5H"));
+    tooSlowHeavy.startup = 40;
+    tooSlowHeavy.active = 4;
+    tooSlowHeavy.hitboxes = {{40, 43, Rect{22, 28, 78, 30}}};
+    assert(!tryApplyMoveHybrid(SearchNode{first.next, first.nextRepresentativeFrame}, tooSlowHeavy, db).valid);
+
     SearchSettings settings;
     settings.maxDepth = MAX_COMBO_LEN;
     settings.forcedStarter = db.idByName("2M");

@@ -248,8 +248,12 @@ inputs so wall pressure does not require releasing directions perfectly.
 It also shows a compact command list and a live combo counter with current hits,
 combo damage, and max hits. A 10-frame input buffer stores commands entered
 during recovery or hitstop and runs them on the first legal actionable frame.
+Buffered commands can also fire during valid cancel windows, matching route
+search transitions such as `2M > 5H > 2H`.
 The debugger enforces the example move requirements used by route search,
 including self/opponent grounded or airborne state and the juggle cap.
+When the opponent returns to neutral, combo-only resources such as scaling,
+juggle, wall bounce, and wall splat are reset for the next attempt.
 
 Run tests:
 
